@@ -207,3 +207,8 @@ marimo/_lsp/
 __marimo__/
 
 # IDE
+.idea/
+
+# dlt
+.dlt/.sources
+.dlt/secrets.toml
