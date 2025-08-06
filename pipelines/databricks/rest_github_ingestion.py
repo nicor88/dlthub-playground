@@ -2,7 +2,6 @@ import os
 
 import dlt
 from dlt.destinations import databricks
-from dlt.sources.helpers.rest_client.paginators import OffsetPaginator
 from dlt.sources.rest_api import rest_api_source
 from dlt.sources.rest_api.typing import BearerTokenAuth
 from dotenv import dotenv_values
@@ -17,8 +16,6 @@ bricks = databricks(
         "access_token": config.get("DATABRICKS_TOKEN")},
     staging_volume_name=config.get('DATABRICKS_VOLUME_NAME')
 )
-
-from dlt.sources.helpers.rest_client import RESTClient
 
 rest_source = rest_api_source(
     {
