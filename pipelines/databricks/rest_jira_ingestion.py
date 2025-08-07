@@ -1,38 +1,32 @@
+import os
+
 import dlt
 from dlt.destinations import databricks
 from dlt.sources.helpers.rest_client.paginators import OffsetPaginator
 from dlt.sources.rest_api import rest_api_source
 from dlt.sources.rest_api.typing import HttpBasicAuthConfig
-from dotenv import dotenv_values
+from dotenv import load_dotenv
 
-config = dotenv_values(".env")
+load_dotenv()
 
-bricks = databricks(
-    credentials={
-        "catalog": config.get('DATABRICKS_CATALOG_NAME'),
-        "server_hostname": config.get('DATABRICKS_HOST'),
-        "http_path": config.get('DATABRICKS_HTTP_PATH'),
-        "access_token": config.get("DATABRICKS_TOKEN")},
-    staging_volume_name=config.get('DATABRICKS_VOLUME_NAME')
-)
+DATABRICKS_SCHEMA_NAME = os.environ["DATABRICKS_SCHEMA_NAME"]
+DATABRICKS_VOLUME_NAME = os.environ["DATABRICKS_VOLUME_NAME"]
+
+bricks = databricks(staging_volume_name=DATABRICKS_VOLUME_NAME)
 
 rest_source = rest_api_source(
     {
         "client": {
-            "base_url": f"https://{config.get('JIRA_SUBDOMAIN')}.atlassian.net/",
+            "base_url": f"https://{dlt.secrets['JIRA_SUBDOMAIN']}.atlassian.net/",
             "headers": {"Accept": "application/json"},
             "auth": HttpBasicAuthConfig(
                 type="http_basic",
-                username=config.get('JIRA_EMAIL'),
-                password=config.get("JIRA_API_TOKEN")
+                username=dlt.secrets["JIRA_EMAIL"],
+                password=dlt.secrets["JIRA_API_TOKEN"],
             ),
             "paginator": OffsetPaginator(
-                limit=50,
-                offset=0,
-                limit_param="maxResults",
-                offset_param="startAt"
+                limit=50, offset=0, limit_param="maxResults", offset_param="startAt"
             ),
-
         },
         "resources": [
             {
@@ -48,18 +42,16 @@ rest_source = rest_api_source(
                         "validateQuery": "strict",
                         "jql": "project = 'DATAENG' AND (created >= -20d OR updated >= -20d)",
                     },
-                    "data_selector": "issues"
+                    "data_selector": "issues",
                 },
-
             }
-        ]
+        ],
     }
-
 )
 
 pipeline = dlt.pipeline(
     pipeline_name="rest_jira_ingestion",
-    dataset_name=config.get('DATABRICKS_SCHEMA_NAME'),
+    dataset_name=DATABRICKS_SCHEMA_NAME,
     destination=bricks,
 )
 

@@ -1,18 +1,15 @@
+import os
+
 import dlt
 from dlt.destinations import databricks
 from dlt.sources.rest_api import rest_api_source
-from dotenv import dotenv_values
+from dotenv import load_dotenv
 
-config = dotenv_values(".env")
+load_dotenv()
+DATABRICKS_SCHEMA_NAME = os.environ["DATABRICKS_SCHEMA_NAME"]
+DATABRICKS_VOLUME_NAME = os.environ["DATABRICKS_VOLUME_NAME"]
 
-bricks = databricks(
-    credentials={
-        "catalog": config.get('DATABRICKS_CATALOG_NAME'),
-        "server_hostname": config.get('DATABRICKS_HOST'),
-        "http_path": config.get('DATABRICKS_HTTP_PATH'),
-        "access_token": config.get("DATABRICKS_TOKEN")},
-    staging_volume_name=config.get('DATABRICKS_VOLUME_NAME')
-)
+bricks = databricks(staging_volume_name=DATABRICKS_VOLUME_NAME)
 pokemon_source = rest_api_source(
     {
         "client": {"base_url": "https://pokeapi.co/api/v2/"},
@@ -21,18 +18,15 @@ pokemon_source = rest_api_source(
                 "name": "pokemon",
                 "write_disposition": "merge",
                 "primary_key": "name",
-                "endpoint": {
-                    "path": "pokemon",
-                    "params": {"limit": 1000}
-                },
+                "endpoint": {"path": "pokemon", "params": {"limit": 1000}},
             },
-        ]
+        ],
     }
 )
 
 pipeline = dlt.pipeline(
     pipeline_name="rest_pokemon_ingestion",
-    dataset_name=config.get('DATABRICKS_SCHEMA_NAME'),
+    dataset_name=DATABRICKS_SCHEMA_NAME,
     destination=bricks,
 )
 

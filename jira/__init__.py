@@ -10,7 +10,7 @@ from dlt.sources.helpers import requests
 from .settings import DEFAULT_ENDPOINTS, DEFAULT_PAGE_SIZE
 
 
-@dlt.source(max_table_nesting=0)
+@dlt.source(max_table_nesting=2)
 def jira(
     subdomain: str = dlt.secrets.value,
     email: str = dlt.secrets.value,
@@ -44,7 +44,7 @@ def jira(
     return resources
 
 
-@dlt.source(max_table_nesting=0)
+@dlt.source(max_table_nesting=2)
 def jira_search(
     subdomain: str = dlt.secrets.value,
     email: str = dlt.secrets.value,
@@ -63,7 +63,7 @@ def jira_search(
         Iterable[DltResource]: Resource function for searching issues.
     """
 
-    @dlt.resource(write_disposition="replace", max_table_nesting=0)
+    @dlt.resource(write_disposition="replace")
     def issues(jql_queries: List[str]) -> Iterable[TDataItem]:
         api_path = "rest/api/3/search"
 
