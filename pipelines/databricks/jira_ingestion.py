@@ -55,8 +55,5 @@ pipeline = dlt.pipeline(
 pipeline.run(
     jira_issues(
         jql_queries=jira_queries,
-        # subdomain=config.get('JIRA_SUBDOMAIN'),
-        # email=config.get('JIRA_EMAIL'),
-        # api_token=config.get("JIRA_API_TOKEN"),
     )
 )
