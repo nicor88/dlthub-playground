@@ -18,5 +18,13 @@ A playground repository for dltHub (data load tool)
 ## Sources
 
 ### Jira
-Run the following command to initialize the Jira source `dlt init --source jira`.
-After that, a `jira` folder will be created in the `sources` directory.
+Run the following command to initialize the Jira source `dlt init jira duckdb`.
+After that, a `jira` folder will be created. Then we copy in the `sources` directory.
+
+## Handling secrets
+This repository uses environment variables to handle secrets.
+You can set them in the `.env` file, or export them in your terminal session, or alternatively we use `dotenv` to load them from the `.env` file in a python context.
+
+Destinations secrets are set prefixing them by `DESTINATION__DATABRICKS__CREDENTIALS__`.
+While for sources secrets we prefix them by the source e.g. in for Jira API token we set `JIRA_API_TOKEN` in the `.env` file, because we use
+as argument `jira_api_token` in the source functions.

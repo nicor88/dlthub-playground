@@ -1,22 +1,20 @@
+import os
 import random
 
 import dlt
 from dlt.destinations import databricks
-from dotenv import dotenv_values
+from dotenv import load_dotenv
 from faker import Faker
+
+load_dotenv()
+
+DATABRICKS_SCHEMA_NAME = os.environ["DATABRICKS_SCHEMA_NAME"]
+DATABRICKS_VOLUME_NAME = os.environ["DATABRICKS_VOLUME_NAME"]
 
 fake = Faker()
 
-config = dotenv_values(".env")
+bricks = databricks(staging_volume_name=DATABRICKS_VOLUME_NAME)
 
-bricks = databricks(
-    credentials={
-        "catalog": config.get('DATABRICKS_CATALOG_NAME'),
-        "server_hostname": config.get('DATABRICKS_HOST'),
-        "http_path": config.get('DATABRICKS_HTTP_PATH'),
-        "access_token": config.get("DATABRICKS_TOKEN")},
-    staging_volume_name=config.get('DATABRICKS_VOLUME_NAME')
-)
 
 def generate_event():
     return {
@@ -28,36 +26,35 @@ def generate_event():
         "location": {
             "venue": fake.company(),
             "address": fake.address(),
-            "coordinates": {
-                "lat": fake.latitude(),
-                "lng": fake.longitude()
-            }
+            "coordinates": {"lat": fake.latitude(), "lng": fake.longitude()},
         },
         "organizer": {
             "name": fake.name(),
             "email": fake.email(),
-            "phone": fake.phone_number()
+            "phone": fake.phone_number(),
         },
         "participants": [
             {
                 "name": fake.name(),
                 "email": fake.email(),
-                "rsvp": random.choice(["Yes", "No", "Maybe"])
+                "rsvp": random.choice(["Yes", "No", "Maybe"]),
             }
             for _ in range(random.randint(2, 5))
         ],
         "tags": fake.words(nb=random.randint(2, 5)),
-        "is_online": random.choice([True, False])
+        "is_online": random.choice([True, False]),
     }
 
-@dlt.resource(name='events', write_disposition='append', max_table_nesting=2)
+
+@dlt.resource(name="events", write_disposition="append", max_table_nesting=2)
 def generate_events():
     for _ in range(10):
         yield generate_event()
 
+
 pipeline = dlt.pipeline(
     pipeline_name="python_source_ingestion",
-    dataset_name=config.get('DATABRICKS_SCHEMA_NAME'),
+    dataset_name=DATABRICKS_SCHEMA_NAME,
     destination=bricks,
 )
 

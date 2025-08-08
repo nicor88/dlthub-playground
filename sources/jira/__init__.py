@@ -1,4 +1,4 @@
-""" This source uses Jira API and dlt to load data such as Issues, Users, Workflows and Projects to the database. """
+"""This source uses Jira API and dlt to load data such as Issues, Users, Workflows and Projects to the database."""
 
 from typing import Iterable, List, Optional
 
