@@ -10,7 +10,10 @@ load_dotenv()
 DATABRICKS_SCHEMA_NAME = os.environ["DATABRICKS_SCHEMA_NAME"]
 DATABRICKS_VOLUME_NAME = os.environ["DATABRICKS_VOLUME_NAME"]
 
-bricks = databricks(staging_volume_name=DATABRICKS_VOLUME_NAME)
+bricks = databricks(
+    staging_volume_name=DATABRICKS_VOLUME_NAME,
+    staging_dataset_name_layout=f"{DATABRICKS_SCHEMA_NAME}_landing",
+)
 
 rest_source = rest_api_source(
     {
@@ -32,27 +35,27 @@ rest_source = rest_api_source(
                     "path": f"orgs/{dlt.secrets['GITHUB_ORG']}/repos",
                 },
             },
-            {
-                "name": "github_repositories_pull_requests",
-                "write_disposition": "append",
-                "max_table_nesting": 0,
-                "endpoint": {
-                    "path": os.path.join(
-                        "repos", dlt.secrets["GITHUB_ORG"], "{repository_name}", "pulls"
-                    ),
-                    "params": {
-                        "repository_name": {
-                            # Use type "resolve" to define child endpoint which should be resolved
-                            "type": "resolve",
-                            # Parent endpoint resource name
-                            "resource": "github_repositories",
-                            # The specific field from the parent endpoint that needs to be used for iteration
-                            "field": "name",
-                        }
-                    },
-                },
-                "include_from_parent": ["name"],
-            },
+            # {
+            #     "name": "github_repositories_pull_requests",
+            #     "write_disposition": "append",
+            #     "max_table_nesting": 0,
+            #     "endpoint": {
+            #         "path": os.path.join(
+            #             "repos", dlt.secrets["GITHUB_ORG"], "{repository_name}", "pulls"
+            #         ),
+            #         "params": {
+            #             "repository_name": {
+            #                 # Use type "resolve" to define child endpoint which should be resolved
+            #                 "type": "resolve",
+            #                 # Parent endpoint resource name
+            #                 "resource": "github_repositories",
+            #                 # The specific field from the parent endpoint that needs to be used for iteration
+            #                 "field": "name",
+            #             }
+            #         },
+            #     },
+            #     "include_from_parent": ["name"],
+            # },
         ],
     }
 )
