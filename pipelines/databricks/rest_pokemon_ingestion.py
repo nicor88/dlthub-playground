@@ -9,7 +9,12 @@ load_dotenv()
 DATABRICKS_SCHEMA_NAME = os.environ["DATABRICKS_SCHEMA_NAME"]
 DATABRICKS_VOLUME_NAME = os.environ["DATABRICKS_VOLUME_NAME"]
 
-bricks = databricks(staging_volume_name=DATABRICKS_VOLUME_NAME)
+bricks = databricks(
+    staging_volume_name=DATABRICKS_VOLUME_NAME,
+    staging_dataset_name_layout="%s_landing",
+    enable_dataset_name_normalization=False,
+)
+
 pokemon_source = rest_api_source(
     {
         "client": {"base_url": "https://pokeapi.co/api/v2/"},

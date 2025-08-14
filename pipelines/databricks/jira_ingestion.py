@@ -15,7 +15,11 @@ DATABRICKS_VOLUME_NAME = os.environ["DATABRICKS_VOLUME_NAME"]
 
 jira_queries = ["project = 'DATAENG' AND (created >= -15d OR updated >= -15d)"]
 
-bricks = databricks(staging_volume_name=DATABRICKS_VOLUME_NAME)
+bricks = databricks(
+    staging_volume_name=DATABRICKS_VOLUME_NAME,
+    staging_dataset_name_layout="%s_landing",
+    enable_dataset_name_normalization=False,
+)
 
 
 @dlt.resource(name="jira_issues", write_disposition="replace", max_table_nesting=0)

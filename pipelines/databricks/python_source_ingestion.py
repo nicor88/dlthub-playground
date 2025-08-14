@@ -13,7 +13,11 @@ DATABRICKS_VOLUME_NAME = os.environ["DATABRICKS_VOLUME_NAME"]
 
 fake = Faker()
 
-bricks = databricks(staging_volume_name=DATABRICKS_VOLUME_NAME)
+bricks = databricks(
+    staging_volume_name=DATABRICKS_VOLUME_NAME,
+    staging_dataset_name_layout="%s_landing",
+    enable_dataset_name_normalization=False,
+)
 
 
 def generate_event():
