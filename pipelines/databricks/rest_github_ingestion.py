@@ -40,6 +40,7 @@ rest_source = rest_api_source(
                 "name": "github_repositories_pull_requests",
                 "write_disposition": "append",
                 "max_table_nesting": 0,
+                "parallelized": False,
                 "endpoint": {
                     "path": os.path.join(
                         "repos", dlt.secrets["GITHUB_ORG"], "{repository_name}", "pulls"
